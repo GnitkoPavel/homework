@@ -1,0 +1,6 @@
+int number1 = 1; //varible 1
+int number2 = 3; //varible 2
+int Nam1 = 3; //varible 3
+swap(&number1, &number2); //Call of function
+printf("Num1 = % i, Num2 = %i\n", number1, number2); //Print variables
+printf("Num1 + Num2 = %i\n", Sum(number1, number2)); //Call of function Sum and print result
