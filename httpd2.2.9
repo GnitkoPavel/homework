@@ -1,0 +1,31 @@
+#!/bin/bash
+
+HTTPD=/opt/bin/httpd
+
+start(){
+	$HTTPD
+	if [ $? == 0 ]; then
+		echo HTTPD server start now!
+	else
+		echo WTF dude?
+	fi
+}
+stop(){
+	killall httpd
+	echo I kill for you all process httpd
+}
+restart(){
+	stop
+	start
+
+}
+status(){
+	ps -p $(cat /opt/logs/httpd.pid) > /dev/null 2>&1
+	if [ $? == 0 ]; then
+		echo HTTPD IS RUNNING!
+	else
+		echo HTTPD IS STOPPED!
+	fi
+
+}
+$1
