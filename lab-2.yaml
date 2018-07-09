@@ -13,7 +13,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mysecret
+  name: mysql-password
 type: Opaque
 data:
   username: cm9vdA==
@@ -28,18 +28,18 @@ metadata:
     app: mysql
 spec:
   containers:
-  - name: mysql
+  - name: mysql-server
     image: mysql
     env:
     - name: MYSQL_ROOT_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: mysecret
+          name: mysql-password
           key: password
     - name: MYSQL_USER
       valueFrom:
         secretKeyRef:
-          name: mysecret
+          name: mysql-password
           key: username
     resources:
       requests:
@@ -56,7 +56,7 @@ metadata:
     role: client
 spec:
   containers:
-  - name: client
+  - name: mysql-client
     image: mysql
     lifecycle:
       postStart:
@@ -66,12 +66,12 @@ spec:
     - name: MYSQL_ROOT_PASSWORD
       valueFrom:
         secretKeyRef:
-          name: mysecret
+          name: mysql-password
           key: password
     - name: PASSWORD
       valueFrom:
         secretKeyRef:
-          name: mysecret
+          name: mysql-password
           key: password
     resources:
       requests:
