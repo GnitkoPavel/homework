@@ -1,0 +1,99 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-1-config 
+data:
+  default_8081.conf: "server {\r\n    listen       8081;\r\n    server_name  localhost;\r\n\r\n
+    \   #charset koi8-r;\r\n    #access_log  /var/log/nginx/host.access.log  main;\r\n\r\n
+    \   location / {\r\n        root   /usr/share/nginx/html;\r\n        index  index.html
+    index.htm;\r\n    }\r\n\r\n    #error_page  404              /404.html;\r\n\r\n
+    \   # redirect server error pages to the static page /50x.html\r\n    #\r\n    error_page
+    \  500 502 503 504  /50x.html;\r\n    location = /50x.html {\r\n        root   /usr/share/nginx/html;\r\n
+    \   }\r\n}"
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-2-config 
+data:
+  default_8082.conf: "server {\r\n    listen       8082;\r\n    server_name  localhost;\r\n\r\n
+    \   #charset koi8-r;\r\n    #access_log  /var/log/nginx/host.access.log  main;\r\n\r\n
+    \   location / {\r\n        root   /usr/share/nginx/html;\r\n        index  index.html
+    index.htm;\r\n    }\r\n\r\n    #error_page  404              /404.html;\r\n\r\n
+    \   # redirect server error pages to the static page /50x.html\r\n    #\r\n    error_page
+    \  500 502 503 504  /50x.html;\r\n    location = /50x.html {\r\n        root   /usr/share/nginx/html;\r\n
+    \   }\r\n}"
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-1-web
+spec:
+  selector:
+    app: web-1
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8081
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: nginx-2-web
+spec:
+  selector:
+    app: web-2
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8082
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-1
+  labels:
+   app: web-1
+spec:
+  containers:
+  - name: nginx-1
+    image: nginx:latest
+    lifecycle:
+      postStart:
+        exec:
+          command: [ "bin/bash", "-c", "apt update && apt install -y curl" ]
+    volumeMounts:
+      - name: config-1-volume
+        mountPath: /etc/nginx/conf.d/
+    ports:
+    - containerPort: 8081
+  volumes:
+  - name: config-1-volume
+    configMap:
+      name: nginx-1-config
+    
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx-2
+  labels:
+   app: web-2
+spec:
+  containers:
+  - name: nginx-2
+    image: nginx:latest
+    lifecycle:
+      postStart:
+        exec:
+          command: [ "bin/bash", "-c", "apt update && apt install -y curl" ]
+    volumeMounts:
+      - name: config-2-volume
+        mountPath: /etc/nginx/conf.d/     
+    ports:
+    - containerPort: 8082
+  volumes:
+  - name: config-2-volume
+    configMap:
+      name: nginx-2-config
+    
